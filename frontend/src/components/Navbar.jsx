@@ -49,6 +49,18 @@ export default function Navbar() {
   } = useAppStore();
   const navigate = useNavigate();
 
+  // Scroll state for navbar effect
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     if (currentUser) {
       fetchNotifications();
@@ -106,9 +118,9 @@ export default function Navbar() {
         : adminLinks;
 
   const publicLinks = [
-    { to: "/", label: () => t("home"), },
-    { to: "/about", label: () => t("about"), },
-    { to: "/contact", label: () => t("contact"), }, // Placeholder icon
+    { to: "/", label: () => t("home") },
+    { to: "/about", label: () => t("about") },
+    { to: "/contact", label: () => t("contact") }, // Placeholder icon
   ];
 
   function handleLogout() {
@@ -143,7 +155,9 @@ export default function Navbar() {
     );
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+    <header
+      className={`fixed top-0 z-50 w-full border-b border-border transition-all duration-300 ${scrolled ? "bg-card/98 backdrop-blur shadow-md" : "bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80"}`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-[5rem] items-center justify-between gap-4">
           {/* Logo */}
@@ -167,9 +181,10 @@ export default function Navbar() {
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                    ? "bg-farm-green-pale text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-farm-green-pale text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`
                 }
               >
@@ -183,9 +198,10 @@ export default function Navbar() {
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                    ? "bg-farm-green-pale text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-farm-green-pale text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`
                 }
               >
@@ -227,9 +243,10 @@ export default function Navbar() {
             <NavLink
               to="/notifications"
               className={({ isActive }) =>
-                `relative p-1.5 rounded-lg transition-colors ${isActive
-                  ? "bg-farm-green-pale text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                `relative p-1.5 rounded-lg transition-colors ${
+                  isActive
+                    ? "bg-farm-green-pale text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`
               }
             >
@@ -254,7 +271,7 @@ export default function Navbar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="hidden sm:block text-left">
-                    <div className="text-xs font-medium text-foreground leading-none" >
+                    <div className="text-xs font-medium text-foreground leading-none">
                       {currentUser.name?.split(" ")[0]}
                     </div>
                     <div
@@ -331,9 +348,10 @@ export default function Navbar() {
                   to={to}
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${isActive
-                      ? "bg-farm-green-pale text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    `flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-farm-green-pale text-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     }`
                   }
                 >
@@ -345,9 +363,10 @@ export default function Navbar() {
                 to="/notifications"
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${isActive
-                    ? "bg-farm-green-pale text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  `flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-farm-green-pale text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`
                 }
               >

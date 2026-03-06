@@ -32,7 +32,14 @@ import {
   signInWithPhoneNumber,
   RecaptchaVerifier,
 } from "firebase/auth";
-import { firebaseLogin, updateProfile as updateProfileApi } from "../utils/api";
+import {
+  firebaseLogin,
+  updateProfile as updateProfileApi,
+  signup,
+  login,
+  requestOTP,
+  verifyOTP
+} from "../utils/api";
 
 // ── Language options ──────────────────────────────────────────────────────
 const LANGUAGES = [
@@ -65,18 +72,10 @@ export default function AuthPage() {
     language,
   } = useAppStore();
 
-  const [step, setStep] = useState(1);
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [role, setRole] = useState(null);
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [selectedLang, setSelectedLang] = useState(language);
-  const [phoneError, setPhoneError] = useState("");
-  const [otpError, setOtpError] = useState("");
-  const [profileError, setProfileError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSignup, setIsSignup] = useState(false);
+  const [authMode, setAuthMode] = useState("phone"); // "phone" or "email"
   const otpRefs = useRef([]);
 
   // Function to save FCM token (best effort, non-blocking)
@@ -162,19 +161,14 @@ export default function AuthPage() {
     if (!validatePhone()) return;
     try {
       setIsLoading(true);
-      const appVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-        size: "invisible",
-      });
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        `+91${phone}`,
-        appVerifier,
-      );
-      setConfirmationResult(confirmation);
-      setStep(2);
+      const data = await requestOTP(phone);
+      if (data.success) {
+        toast.success("OTP sent to your phone");
+        setStep(2);
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to send OTP");
+      toast.error(error.response?.data?.message || "Failed to send OTP");
     } finally {
       setIsLoading(false);
     }
@@ -188,22 +182,50 @@ export default function AuthPage() {
     }
     try {
       setIsLoading(true);
-      const result = await confirmationResult.confirm(code);
-      const idToken = await result.user.getIdToken();
-
-      const data = await firebaseLogin(idToken);
+      const data = await verifyOTP(phone, code);
       if (data.success) {
         setToken(data.token);
         setCurrentUser(data.user);
-
-        // Save FCM token for notifications
         await saveFcmToken();
 
-        setStep(3); // role selection step
+        // If user already has profile details, skip role selection
+        if (data.user.location && data.user.role) {
+          toast.success(t("auth.loginSuccess"));
+        } else {
+          setStep(3);
+        }
       }
     } catch (error) {
       console.error(error);
-      setOtpError("Invalid OTP");
+      setOtpError(error.response?.data?.message || "Invalid OTP");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleEmailAuth() {
+    if (!email || !password) {
+      toast.error("Email and password are required");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      let data;
+      if (isSignup) {
+        data = await signup({ name: "User", email, password, phone: "0000000000", role: "buyer" });
+      } else {
+        data = await login({ email, password });
+      }
+
+      if (data.success) {
+        setToken(data.token);
+        setCurrentUser(data.user);
+        await saveFcmToken();
+        toast.success(t("auth.loginSuccess"));
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Authentication failed");
     } finally {
       setIsLoading(false);
     }
@@ -403,88 +425,142 @@ export default function AuthPage() {
                   Continue with Google
                 </Button>
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-3 text-muted-foreground">
-                      or sign in with phone
-                    </span>
-                  </div>
-                </div>
-
-                {/* Language selector */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5 text-sm font-medium">
-                    <Globe className="w-3.5 h-3.5" />
-                    {t("auth.language")}
-                  </Label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {LANGUAGES.map((lang) => (
-                      <button
-                        type="button"
-                        key={lang.code}
-                        onClick={() => {
-                          setSelectedLang(lang.code);
-                          setLanguage(lang.code);
-                        }}
-                        className={`py-2 px-1 rounded-lg border text-center text-xs font-medium transition-all ${selectedLang === lang.code
-                          ? "border-primary bg-farm-green-pale text-primary"
-                          : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                          }`}
-                      >
-                        <div className="text-sm">{lang.native}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Phone input */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="phone"
-                    className="flex items-center gap-1.5 text-sm font-medium"
+                <div className="flex gap-2 p-1 bg-muted rounded-xl">
+                  <button
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${authMode === 'phone' ? 'bg-background shadow-sm' : 'text-muted-foreground'}`}
+                    onClick={() => setAuthMode('phone')}
                   >
-                    <Phone className="w-3.5 h-3.5" />
-                    {t("auth.phone")}
-                  </Label>
-                  <div className="flex gap-2">
-                    <div className="flex items-center px-3 rounded-lg border border-input bg-muted text-sm font-medium text-muted-foreground select-none">
-                      🇮🇳 +91
-                    </div>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder={t("auth.phonePlaceholder")}
-                      value={phone}
-                      onChange={(e) => {
-                        setPhone(
-                          e.target.value.replace(/\D/g, "").slice(0, 10),
-                        );
-                        setPhoneError("");
-                      }}
-                      onKeyDown={(e) => e.key === "Enter" && handleStep1()}
-                      maxLength={10}
-                      className={phoneError ? "border-destructive" : ""}
-                    />
-                  </div>
-                  {phoneError && (
-                    <p className="text-xs text-destructive">{phoneError}</p>
-                  )}
+                    Phone
+                  </button>
+                  <button
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${authMode === 'email' ? 'bg-background shadow-sm' : 'text-muted-foreground'}`}
+                    onClick={() => setAuthMode('email')}
+                  >
+                    Email
+                  </button>
                 </div>
 
-                <div id="recaptcha-container"></div>
+                {authMode === 'email' ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="signup-toggle"
+                        checked={isSignup}
+                        onChange={(e) => setIsSignup(e.target.checked)}
+                      />
+                      <Label htmlFor="signup-toggle" className="text-sm">Create new account</Label>
+                    </div>
+                    <Button onClick={handleEmailAuth} className="w-full" disabled={isLoading}>
+                      {isLoading ? "Wait..." : (isSignup ? "Sign Up" : "Log In")}
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-border" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-3 text-muted-foreground">
+                          or sign in with phone
+                        </span>
+                      </div>
+                    </div>
 
-                <Button
-                  onClick={handlePhoneSignIn}
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                  size="lg"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending OTP..." : t("auth.continue")}
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
+                    {/* Language selector */}
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-1.5 text-sm font-medium">
+                        <Globe className="w-3.5 h-3.5" />
+                        {t("auth.language")}
+                      </Label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {LANGUAGES.map((lang) => (
+                          <button
+                            type="button"
+                            key={lang.code}
+                            onClick={() => {
+                              setSelectedLang(lang.code);
+                              setLanguage(lang.code);
+                            }}
+                            className={`py-2 px-1 rounded-lg border text-center text-xs font-medium transition-all ${selectedLang === lang.code
+                              ? "border-primary bg-farm-green-pale text-primary"
+                              : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                              }`}
+                          >
+                            <div className="text-sm">{lang.native}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Phone input */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="phone"
+                        className="flex items-center gap-1.5 text-sm font-medium"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        {t("auth.phone")}
+                      </Label>
+                      <div className="flex gap-2">
+                        <div className="flex items-center px-3 rounded-lg border border-input bg-muted text-sm font-medium text-muted-foreground select-none">
+                          🇮🇳 +91
+                        </div>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder={t("auth.phonePlaceholder")}
+                          value={phone}
+                          onChange={(e) => {
+                            setPhone(
+                              e.target.value.replace(/\D/g, "").slice(0, 10),
+                            );
+                            setPhoneError("");
+                          }}
+                          onKeyDown={(e) => e.key === "Enter" && handleStep1()}
+                          maxLength={10}
+                          className={phoneError ? "border-destructive" : ""}
+                        />
+                      </div>
+                      {phoneError && (
+                        <p className="text-xs text-destructive">{phoneError}</p>
+                      )}
+                    </div>
+
+                    <div id="recaptcha-container"></div>
+
+                    <Button
+                      onClick={handlePhoneSignIn}
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                      size="lg"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Sending OTP..." : t("auth.continue")}
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </>
+                )}
               </motion.div>
             )}
 

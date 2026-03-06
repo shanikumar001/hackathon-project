@@ -13,11 +13,11 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="pt-24 pb-16 min-h-screen bg-background">
+        <div className="pt-14 min-h-screen bg-background mt-20">
             <div className="container px-6 mx-auto">
-                <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16">
+                <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16 justify-between">
                     {/* Contact Info */}
-                    <div className="lg:w-1/3 space-y-12">
+                    <div className="lg:w-1/3 space-y-12 pt-20">
                         <div className="space-y-4">
                             <h1 className="text-4xl font-display font-bold">{t("contact.title")}</h1>
                             <p className="text-lg text-muted-foreground leading-relaxed">
@@ -66,7 +66,7 @@ export default function ContactPage() {
                     </div>
 
                     {/* Contact Form */}
-                    <div className="lg:w-2/3">
+                    <div className="lg:w-2/4">
                         <div className="p-8 md:p-12 rounded-[2.5rem] bg-card border border-border shadow-xl">
                             <h2 className="text-2xl font-bold mb-8">{t("contact.getInTouch")}</h2>
                             <form onSubmit={handleSendMessage} className="space-y-6">

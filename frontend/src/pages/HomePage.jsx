@@ -29,20 +29,20 @@ export default function HomePage() {
     };
 
     return (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full px-20">
             {/* Hero Section */}
-            <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-gradient-to-b from-farm-green-pale/50 to-background">
-                <div className="absolute inset-0 z-0">
+            <section className="relative max-h-[80vh] flex items-center py-80 mt-[120px]">
+                {/* <div className="absolute inset-0 z-0">
                     <motion.img
                         initial={{ scale: 1.1, opacity: 0 }}
                         animate={{ scale: 1, opacity: 0.2 }}
                         transition={{ duration: 1.5, ease: "easeOut" }}
-                        src="/artifacts/meghalaya_farm_hero_1772729701685.png"
+                        src=""
                         alt="Meghalaya Farm"
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent"></div>
-                </div>
+                </div> */}
 
                 <div className="container relative z-10 px-6 mx-auto grid lg:grid-cols-2 gap-12 items-center">
                     <motion.div
@@ -83,23 +83,23 @@ export default function HomePage() {
                         initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
                         animate={{ opacity: 1, scale: 1, rotate: 0 }}
                         transition={{ duration: 1, delay: 0.3 }}
-                        className="relative hidden lg:block"
+                        className="relative lg:block h-[80%]"
                     >
-                        <div className="relative z-10 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white">
+                        <div className="relative z-10 rounded-[50%] overflow-hidden shadow-xl border-4 border-white">
                             <img
-                                src="/artifacts/fresh_produce_basket_1772729731157.png"
+                                src="https://images.pexels.com/photos/2880741/pexels-photo-2880741.jpeg"
                                 alt="Fresh Produce"
-                                className="w-full aspect-[4/5] object-cover"
+                                className="h-full w-full aspect-[4/5] object-cover"
                             />
                         </div>
-                        <div className="absolute -top-6 -right-6 w-32 h-32 bg-farm-amber/20 rounded-full blur-3xl -z-10"></div>
-                        <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-primary/20 rounded-full blur-3xl -z-10"></div>
+                        {/* <div className="absolute -top-6 -right-6 w-32 h-32 bg-farm-amber/20 rounded-full blur-3xl -z-10"></div>
+                        <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-primary/20 rounded-full blur-3xl -z-10"></div> */}
                     </motion.div>
                 </div>
             </section>
 
             {/* How It Works Section */}
-            <section className="py-24 bg-card">
+            <section className="py-24 ">
                 <div className="container px-6 mx-auto">
                     <motion.div
                         {...fadeInUp}
@@ -114,7 +114,7 @@ export default function HomePage() {
                         initial="initial"
                         whileInView="whileInView"
                         viewport={{ once: true }}
-                        className="grid md:grid-cols-3 gap-8"
+                        className="grid md:grid-cols-3 gap-8 "
                     >
                         {[
                             {
@@ -191,7 +191,7 @@ export default function HomePage() {
                                 className="pt-12 space-y-4"
                             >
                                 <div className="aspect-square rounded-3xl overflow-hidden shadow-lg border border-border">
-                                    <img src="/artifacts/fresh_produce_basket_1772729731157.png" alt="Crop" className="w-full h-full object-cover" />
+                                    <img src="https://images.pexels.com/photos/2382904/pexels-photo-2382904.jpeg" alt="Crop" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="aspect-[4/3] rounded-3xl bg-primary flex flex-col justify-end p-6 text-primary-foreground italic">
                                     <p>"Technology is the new seed for our future harvests."</p>
@@ -212,7 +212,7 @@ export default function HomePage() {
                                     </div>
                                 </div>
                                 <div className="aspect-square rounded-3xl overflow-hidden shadow-lg border border-border">
-                                    <img src="/artifacts/meghalaya_farm_hero_1772729701685.png" alt="Farmer" className="w-full h-full object-cover" />
+                                    <img src="https://images.pexels.com/photos/12922925/pexels-photo-12922925.jpeg" alt="Farmer" className="w-full h-full object-cover" />
                                 </div>
                             </motion.div>
                         </div>
@@ -220,34 +220,9 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Impact Section */}
-            <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[40rem] h-[40rem] bg-white/10 rounded-full blur-[100px]"></div>
-                <motion.div
-                    {...fadeInUp}
-                    className="container relative z-10 px-6 mx-auto text-center max-w-4xl"
-                >
-                    <h2 className="text-4xl lg:text-5xl font-display font-bold mb-8">
-                        {t("home.impactTitle")}
-                    </h2>
-                    <p className="text-xl opacity-90 leading-relaxed mb-12">
-                        {t("home.impactDesc")}
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        {[
-                            { val: "5000+", label: "Farmers" },
-                            { val: "20+", label: "Districts" },
-                            { val: "100%", label: "Fair Price" },
-                            { val: "24/7", label: "Support" }
-                        ].map((stat, i) => (
-                            <div key={i} className="space-y-1">
-                                <p className="text-3xl font-bold">{stat.val}</p>
-                                <p className="text-sm opacity-60 uppercase tracking-widest">{stat.label}</p>
-                            </div>
-                        ))}
-                    </div>
-                </motion.div>
-            </section>
+            
+
+            
         </div>
     );
 }

@@ -406,7 +406,7 @@ export default function FarmerDashboard() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6" >
+    <div className=" mx-auto px-4 sm:px-6 py-6 mt-20 flex-col" >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -488,7 +488,7 @@ export default function FarmerDashboard() {
         {/* ── My listings tab ──────────────────────────────────────── */}
         <TabsContent value="listings">
           {myProducts.length === 0 ? (
-            <div className="text-center py-16 space-y-3">
+            <div className="text-center py-16 flex-row space-3">
               <div className="w-14 h-14 rounded-2xl bg-farm-green-pale flex items-center justify-center mx-auto">
                 <Sprout className="w-7 h-7 text-primary/60" />
               </div>
@@ -505,7 +505,7 @@ export default function FarmerDashboard() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               <AnimatePresence mode="popLayout">
                 {myProducts.map((product) => (
                   <motion.div

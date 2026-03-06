@@ -180,7 +180,7 @@ export default function MarketplacePage() {
       {/* ── Hero banner ────────────────────────────────────────────────── */}
       <div className="relative h-40 md:h-64 overflow-hidden">
         <img
-          src="/artifacts/meghalaya_farm_hero_1772729701685.png"
+          src="https://images.pexels.com/photos/30794825/pexels-photo-30794825.jpeg"
           alt="Farm marketplace"
           className="w-full h-full object-cover object-center opacity-80"
         />
@@ -402,7 +402,7 @@ export default function MarketplacePage() {
         ) : (
           <motion.div
             layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             <AnimatePresence>
               {filteredProducts.map((product) => (
@@ -423,6 +423,7 @@ export default function MarketplacePage() {
           </motion.div>
         )}
       </div>
+
 
       {/* ── Product detail modal ─────────────────────────────────────── */}
       <Dialog

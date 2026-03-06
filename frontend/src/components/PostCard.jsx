@@ -62,7 +62,7 @@ export default function PostCard({
       exit={{ opacity: 0, scale: 0.95 }}
       viewport={{ once: true }}
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
-      className="group bg-card rounded-[2rem] border border-border/50 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-shadow duration-300 flex flex-col"
+      className="group rounded-[8px] border border-border/50 overflow-hidden hover:shadow-primary/10 transition-shadow duration-300 flex flex-col hover:shadow-sm "
     >
       {/* Image Container */}
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
@@ -90,7 +90,7 @@ export default function PostCard({
       </div>
 
       {/* Content */}
-      <div className="p-5 flex-1 flex flex-col gap-4">
+      <div className="p-5 flex-1 flex flex-col gap-1">
         {/* Title & Description */}
         <div>
           <h3 className="text-lg font-display font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">

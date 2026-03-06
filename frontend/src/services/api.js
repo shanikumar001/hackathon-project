@@ -6,6 +6,10 @@
 export {
     default,
     firebaseLogin,
+    signup,
+    login,
+    requestOTP,
+    verifyOTP,
     getProfile,
     updateProfile,
     createPost,

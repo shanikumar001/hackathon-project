@@ -38,16 +38,51 @@ api.interceptors.response.use(
 
 // ── Auth API ──────────────────────────────────────────────────────────────
 
-/**
- * Authenticate via Firebase ID token.
- * Backend verifies the token, creates/finds user, and returns a JWT.
- * @param {string} idToken - Firebase ID token
- * @returns {Promise<{success, token, user}>}
- */
 export const firebaseLogin = async (idToken) => {
     const response = await api.post('/auth/firebase-login', { idToken });
     console.log('✅ Firebase Authentication successful');
     console.log(`🔑 Logged in as: ${response.data.user.name}`);
+
+    // Store token
+    if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+    }
+
+    return response.data;
+};
+
+/**
+ * Register a new user with email/password.
+ */
+export const signup = async (userData) => {
+    const response = await api.post('/auth/signup', userData);
+    if (response.data.token) localStorage.setItem('token', response.data.token);
+    return response.data;
+};
+
+/**
+ * Login with email/password.
+ */
+export const login = async (credentials) => {
+    const response = await api.post('/auth/login', credentials);
+    if (response.data.token) localStorage.setItem('token', response.data.token);
+    return response.data;
+};
+
+/**
+ * Request OTP via Twilio.
+ */
+export const requestOTP = async (phone) => {
+    const response = await api.post('/auth/request-otp', { phone });
+    return response.data;
+};
+
+/**
+ * Verify Twilio OTP.
+ */
+export const verifyOTP = async (phone, otp) => {
+    const response = await api.post('/auth/verify-otp', { phone, otp });
+    if (response.data.token) localStorage.setItem('token', response.data.token);
     return response.data;
 };
 

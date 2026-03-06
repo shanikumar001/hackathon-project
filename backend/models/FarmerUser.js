@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 /**
  * FarmerUser Schema
@@ -9,9 +10,26 @@ const FarmerUserSchema = new mongoose.Schema(
     {
         firebase_uid: {
             type: String,
-            required: true,
+            required: false,
             unique: true,
+            sparse: true,
             index: true,
+        },
+        password: {
+            type: String,
+            required: false,
+        },
+        otp: {
+            type: String,
+            default: null,
+        },
+        otpExpires: {
+            type: Date,
+            default: null,
+        },
+        isVerified: {
+            type: Boolean,
+            default: false,
         },
         name: {
             type: String,
@@ -52,5 +70,20 @@ const FarmerUserSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+
+// Hash password before saving
+FarmerUserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+});
+
+// Compare password method
+FarmerUserSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
 
 module.exports = mongoose.model('FarmerUser', FarmerUserSchema);
