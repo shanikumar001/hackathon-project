@@ -18,7 +18,7 @@ const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";
 
 app.use(
   helmet({
-    crossOriginOpenerPolicy: { policy: "unsafe-allow-allow-popups" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
     crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: false,
   }),
