@@ -68,7 +68,7 @@ export default function Navbar() {
   }, [currentUser, fetchNotifications]);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const unreadCount = notifications.filter((n) => !n.readStatus).length;
+  const unreadCount = (notifications || []).filter((n) => !n.readStatus).length;
 
   // ── Nav links by role ────────────────────────────────────────────────
   const farmerLinks = [
