@@ -40,6 +40,7 @@ import {
   requestOTP,
   verifyOTP,
 } from "../utils/api";
+import { useNavigate, Link } from "react-router-dom";
 
 // ── Language options ──────────────────────────────────────────────────────
 const LANGUAGES = [
@@ -273,17 +274,18 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      // Update user profile on backend
+      // Update user profile on backend with explicit role choice
       const profileData = {
         name: name.trim(),
-        role: role,
+        role: role, // 'buyer' or 'seller'
         location: location.trim(),
+        accountType: role === "farmer" ? "seller" : "buyer",
       };
       const data = await updateProfileApi(profileData);
       if (data.success) {
         setCurrentUser(data.user);
       }
-      toast.success(t("auth.loginSuccess"));
+      toast.success(`Welcome ${role === "farmer" ? "Seller" : "Buyer"}!`);
     } catch (error) {
       console.error(error);
       toast.error("Failed to complete profile");
@@ -327,14 +329,14 @@ export default function AuthPage() {
           </div>
           <div className="bg-green-600/40 w-[60%] pl-5 rounded-[20px]">
             <h1 className="font-display text-4xl font-bold  text-white leading-tight">
-            Connecting Farmers
-            <br />
-            <span className="text-farm-amber">Directly</span> to Buyers
-          </h1>
-          <p className="text-white/80 text-base max-w-sm leading-relaxed">
-            Sell your harvest at fair prices. Reach buyers across India without
-            middlemen. Available in English, Hindi, Khasi, and Mizo.
-          </p>
+              Connecting Farmers
+              <br />
+              <span className="text-farm-amber">Directly</span> to Buyers
+            </h1>
+            <p className="text-white/80 text-base max-w-sm leading-relaxed">
+              Sell your harvest at fair prices. Reach buyers across India
+              without middlemen. Available in English, Hindi, Khasi, and Mizo.
+            </p>
           </div>
           <div className="flex gap-3 pt-2">
             {[
@@ -457,6 +459,13 @@ export default function AuthPage() {
                   Continue with Google
                 </Button>
 
+                <Button
+                  asChild
+                  className="w-full mt-3 bg-primary text-primary-foreground hover:bg-primary/90 h-12 rounded-xl"
+                >
+                  <Link to="/signup">Create New Account</Link>
+                </Button>
+
                 <div className="flex gap-2 p-1 bg-muted rounded-xl">
                   <button
                     className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${authMode === "phone" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
@@ -494,23 +503,38 @@ export default function AuthPage() {
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="signup-toggle"
-                        checked={isSignup}
-                        onChange={(e) => setIsSignup(e.target.checked)}
-                      />
-                      <Label htmlFor="signup-toggle" className="text-sm">
-                        Create new account
-                      </Label>
+                    <div className="flex items-center justify-between pt-4">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="signup-toggle"
+                          checked={isSignup}
+                          onChange={(e) => setIsSignup(e.target.checked)}
+                        />
+                        <Label htmlFor="signup-toggle" className="text-sm">
+                          Create new account
+                        </Label>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleEmailAuth}
+                        disabled={isLoading}
+                        className="h-9 px-4"
+                      >
+                        {isSignup ? "Log In Instead" : "Sign Up Instead"}
+                      </Button>
                     </div>
                     <Button
                       onClick={handleEmailAuth}
                       className="w-full"
                       disabled={isLoading}
                     >
-                      {isLoading ? "Wait..." : isSignup ? "Sign Up" : "Log In"}
+                      {isLoading
+                        ? "Processing..."
+                        : isSignup
+                          ? "Create Account"
+                          : "Log In"}
                     </Button>
                   </div>
                 ) : (
@@ -718,74 +742,70 @@ export default function AuthPage() {
                   </p>
                 </div>
 
-                <div className="grid gap-4">
-                  {/* Farmer card */}
-                  <button
-                    type="button"
-                    onClick={() => handleStep3("farmer")}
-                    className="group relative flex items-start gap-4 p-5 rounded-2xl border-2 border-border hover:border-primary bg-card hover:bg-farm-green-pale transition-all text-left shadow-sm hover:shadow-card"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-farm-green-pale group-hover:bg-white flex items-center justify-center flex-shrink-0 transition-colors">
-                      <Sprout className="w-6 h-6 text-farm-green" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-display font-bold text-foreground text-lg">
-                        {t("auth.farmer")}
+                <div className="space-y-4 p-1">
+                  <div className="text-xs text-center text-muted-foreground font-medium tracking-wider uppercase">
+                    Choose account type (can't change later)
+                  </div>
+                  <div className="grid gap-4">
+                    {/* Seller */}
+                    <motion.button
+                      type="button"
+                      onClick={() => handleStep3("seller")}
+                      className="group relative flex items-start gap-4 p-6 rounded-2xl border-2 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300 hover:shadow-lg transition-all shadow-sm"
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="w-16 h-16 rounded-2xl bg-white shadow-md flex items-center justify-center flex-shrink-0">
+                        <Sprout className="w-8 h-8 text-green-600" />
                       </div>
-                      <div className="text-sm text-muted-foreground mt-0.5">
-                        {t("auth.farmerDesc")}
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          "List products",
-                          "Manage inventory",
-                          "WhatsApp alerts",
-                        ].map((feat) => (
-                          <span
-                            key={feat}
-                            className="text-xs bg-farm-green-pale text-farm-green px-2 py-0.5 rounded-full"
-                          >
-                            {feat}
+                      <div className="flex-1">
+                        <h3 className="font-bold text-xl text-green-800">
+                          Seller / Farmer Account
+                        </h3>
+                        <p className="mt-1 text-sm text-green-700 font-medium">
+                          List your farm produce, set your prices, get direct
+                          orders
+                        </p>
+                        <div className="mt-3 flex gap-2">
+                          <span className="px-3 py-1 bg-white text-xs font-bold text-green-600 rounded-full shadow-sm border">
+                            Add listings
                           </span>
-                        ))}
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary mt-1 transition-colors" />
-                  </button>
-
-                  {/* Buyer card */}
-                  <button
-                    type="button"
-                    onClick={() => handleStep3("buyer")}
-                    className="group relative flex items-start gap-4 p-5 rounded-2xl border-2 border-border hover:border-secondary bg-card hover:bg-farm-amber-pale transition-all text-left shadow-sm hover:shadow-card"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-farm-amber-pale group-hover:bg-white flex items-center justify-center flex-shrink-0 transition-colors">
-                      <ShoppingBag className="w-6 h-6 text-farm-amber" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-display font-bold text-foreground text-lg">
-                        {t("auth.buyer")}
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-0.5">
-                        {t("auth.buyerDesc")}
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          "Search crops",
-                          "Filter by location",
-                          "Contact farmers",
-                        ].map((feat) => (
-                          <span
-                            key={feat}
-                            className="text-xs bg-farm-amber-pale text-farm-earth px-2 py-0.5 rounded-full"
-                          >
-                            {feat}
+                          <span className="px-3 py-1 bg-white text-xs font-bold text-green-600 rounded-full shadow-sm border">
+                            Order management
                           </span>
-                        ))}
+                        </div>
                       </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-secondary mt-1 transition-colors" />
-                  </button>
+                    </motion.button>
+                    {/* Buyer */}
+                    <motion.button
+                      type="button"
+                      onClick={() => handleStep3("buyer")}
+                      className="group relative flex items-start gap-4 p-6 rounded-2xl border-2 bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200 hover:border-orange-300 hover:shadow-lg transition-all shadow-sm"
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="w-16 h-16 rounded-2xl bg-white shadow-md flex items-center justify-center flex-shrink-0">
+                        <ShoppingBag className="w-8 h-8 text-orange-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-xl text-orange-800">
+                          Buyer / Trader Account
+                        </h3>
+                        <p className="mt-1 text-sm text-orange-700 font-medium">
+                          Buy directly from farmers, negotiate prices, save on
+                          middlemen
+                        </p>
+                        <div className="mt-3 flex gap-2">
+                          <span className="px-3 py-1 bg-white text-xs font-bold text-orange-600 rounded-full shadow-sm border">
+                            Search crops
+                          </span>
+                          <span className="px-3 py-1 bg-white text-xs font-bold text-orange-600 rounded-full shadow-sm border">
+                            Direct contact
+                          </span>
+                        </div>
+                      </div>
+                    </motion.button>
+                  </div>
                 </div>
               </motion.div>
             )}

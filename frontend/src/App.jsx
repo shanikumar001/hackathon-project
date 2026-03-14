@@ -31,6 +31,7 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import MessagesPage from "./pages/MessagesPage";
 import AddProductPage from "./pages/AddProductPage";
 import HelpPage from "./pages/HelpingPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
 
 // ── Offline indicator ─────────────────────────────────────────────────────
 function OfflineBar() {
@@ -121,6 +122,18 @@ function AnimatedRoutes() {
             !currentUser ? (
               <PageTransition>
                 <AuthPage />
+              </PageTransition>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            !currentUser ? (
+              <PageTransition>
+                <SignupPage />
               </PageTransition>
             ) : (
               <Navigate to="/" />
