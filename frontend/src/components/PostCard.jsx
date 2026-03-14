@@ -144,7 +144,7 @@ export default function PostCard({
             <Eye className="w-3.5 h-3.5" />
             {t("products.viewDetail")}
           </Button>
-          {isBuyer && isActive && !isOwner && (
+          {isActive && !isOwner && (
             <motion.div whileTap={{ scale: 0.95 }} className="flex-1">
               <Button
                 size="sm"

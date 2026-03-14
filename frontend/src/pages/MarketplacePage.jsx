@@ -158,8 +158,10 @@ export default function MarketplacePage() {
         postId: interestProduct._id || interestProduct.id,
         farmerId:
           interestProduct.userId?._id ||
+          interestProduct.userId?._id ||
           interestProduct.userId ||
-          interestProduct.farmerId,
+          interestProduct.farmerId ||
+          interestProduct.userId.userId,
         message: interestMessage.trim() || t("interests.defaultMessage"),
       });
 
@@ -424,7 +426,6 @@ export default function MarketplacePage() {
         )}
       </div>
 
-
       {/* ── Product detail modal ─────────────────────────────────────── */}
       <Dialog
         open={!!selectedProduct}
@@ -521,21 +522,20 @@ export default function MarketplacePage() {
                 </div>
               </div>
 
-              {currentUser?.role === "buyer" &&
-                selectedProduct.status === "active" && (
-                  <DialogFooter>
-                    <Button
-                      onClick={() => {
-                        setSelectedProduct(null);
-                        setInterestProduct(selectedProduct);
-                      }}
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
-                    >
-                      <Send className="w-4 h-4" />
-                      {t("products.interested")}
-                    </Button>
-                  </DialogFooter>
-                )}
+              {selectedProduct.status === "active" && (
+                <DialogFooter>
+                  <Button
+                    onClick={() => {
+                      setSelectedProduct(null);
+                      setInterestProduct(selectedProduct);
+                    }}
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
+                  >
+                    <Send className="w-4 h-4" />
+                    {t("products.interested")}
+                  </Button>
+                </DialogFooter>
+              )}
             </>
           )}
         </DialogContent>
