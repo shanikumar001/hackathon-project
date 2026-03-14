@@ -30,6 +30,7 @@ import ContactPage from "./pages/ContactPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import MessagesPage from "./pages/MessagesPage";
 import AddProductPage from "./pages/AddProductPage";
+import HelpPage from "./pages/HelpingPage.jsx";
 
 // ── Offline indicator ─────────────────────────────────────────────────────
 function OfflineBar() {
@@ -103,6 +104,14 @@ function AnimatedRoutes() {
           element={
             <PageTransition>
               <ContactPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <PageTransition>
+              <HelpPage />
             </PageTransition>
           }
         />

@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Globe,
   Heart,
+  HelpCircle,
   Leaf,
   ListOrdered,
   LogOut,
@@ -120,6 +121,11 @@ export default function Navbar() {
   const publicLinks = [
     { to: "/", label: () => t("home") },
     { to: "/about", label: () => t("about") },
+    {
+      to: "/help",
+      label: () => t("help") || "Help",
+      icon: <HelpCircle className="w-4 h-4" />,
+    },
     { to: "/contact", label: () => t("contact") }, // Placeholder icon
   ];
 
