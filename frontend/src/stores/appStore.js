@@ -65,13 +65,19 @@ export const useAppStore = create()(
       notifications: [],
       setNotifications: (notifications) => set({ notifications }),
       fetchNotifications: async () => {
-        try {
-          const { data } = await api.get("/notifications/my");
-          set({ notifications: data });
-        } catch (error) {
-          console.error("Error fetching notifications:", error);
-        }
-      },
+      try {
+        const { data } = await api.get("/notifications/my");
+
+        set({
+          notifications: Array.isArray(data)
+            ? data
+            : data.notifications || [],
+        });
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+        set({ notifications: [] });
+      }
+    },
       addNotification: (notification) =>
         set((state) => ({
           notifications: [notification, ...state.notifications],
